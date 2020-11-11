@@ -72,7 +72,6 @@
         </template>
       </v-simple-table>
     </v-card>
-
     <div class="text-center">
     <v-bottom-sheet
       v-model="sheet"
@@ -121,8 +120,8 @@
         <span class="nameLogs">Конфигурация {{client.name}}</span>
         <div class="both"></div>
         <div class="config">
-          <v-jsoneditor  v-if="client.name.split('_')[0]==='puppeteer'" v-model="getConfig"/>
-          <v-jsoneditor  v-if="client.name.split('_')[0]==='mercury'" v-model="json"/>
+          <vue-json-editor  :show-btns="true" @json-save="onJsonSave" v-if="client.name.split('_')[0]==='puppeteer'" v-model="getConfig"/>
+          <!-- <vue-json-editor  v-if="client.name.split('_')[0]==='mercury'" v-model="json"/> -->
         </div>
       </v-sheet>
     </v-bottom-sheet>
@@ -186,11 +185,11 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import VJsoneditor from 'v-jsoneditor/src/index'
+import vueJsonEditor from 'vue-json-editor'
 export default {
   name: "App",
   components: {
-        VJsoneditor
+        vueJsonEditor
     },
 
     mounted() {
@@ -213,11 +212,20 @@ export default {
       checkClient: false,
       json: {
         "hello": "vue"
-      }
+      },
+      config: ''
     }
   },
   computed: {
     ...mapGetters(["getClients", "getEngines","getConfig"]),
+    getConfig: {
+      get() {
+        return this.$store.state.config
+      },
+      set(value) {
+        this.config = value
+      }
+    }
   },
   sockets: {
     connect: function () {
@@ -242,12 +250,18 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["clientsAct", "enginesAct","configAct"]),
+    ...mapActions(["clientsAct", "enginesAct","configAct", "sendConfigAct"]),
     setClient(client) {
       this.client = client
       this.client_name = client.name
       this.puppeteer = this.client_name ? this.client_name.split('_')[0] === 'puppeteer' : false,
       this.dialog = true
+    },
+    onJsonSave(value) {
+      if (Object.keys(value).length > 0) {
+        this.sendConfigAct(value)
+      }
+      else this.sheetConfig = false
     },
     getClientsAct(data) {
       this.clientsAct(data);

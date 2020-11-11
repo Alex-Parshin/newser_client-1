@@ -29,7 +29,11 @@ export default new Vuex.Store({
         },
         config(state, data) {
             state.config = data
+        },
+        setConfig(state, data) {
+            state.config = data
         }
+
     },
     actions: {
         clientsAct({ commit }, data) {
@@ -46,6 +50,11 @@ export default new Vuex.Store({
                 .then(data => {
                     commit('config', data.data)
                 })
+        },
+        async sendConfigAct({ commit }, data) {
+            console.log(data)
+            commit('setConfig', data)
+            await axios.post(`http://${process.env.VUE_APP_HOST}:${process.env.VUE_APP_PORT}/api/setConfig`, { config: data })
         }
     },
     modules: {},
