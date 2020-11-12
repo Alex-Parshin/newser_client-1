@@ -37,7 +37,7 @@
                   <v-btn
                     v-if="
                       item.status === 0 &&
-                        item.name.split('_')[0] === 'puppeteer'
+                      item.name.split('_')[0] === 'puppeteer'
                     "
                     style="margin-right: 10px"
                     outlined
@@ -50,7 +50,7 @@
                   <v-btn
                     v-if="
                       item.status === 0 &&
-                        item.name.split('_')[0] !== 'puppeteer'
+                      item.name.split('_')[0] !== 'puppeteer'
                     "
                     style="margin-right: 10px"
                     outlined
@@ -67,8 +67,8 @@
                   <v-btn
                     v-if="
                       item.status === 1 ||
-                        item.status === 2 ||
-                        item.status === 3
+                      item.status === 2 ||
+                      item.status === 3
                     "
                     :disabled="item.status === 2"
                     style="margin-right: 10px"
@@ -104,8 +104,26 @@
               >
                 Смотреть
               </td> -->
-              <td style="cursor:pointer" @click="client=item; sheetConfig=true; checkClient=true; getConfigAct()">Изменить</td>
-              <td style="cursor:pointer;" @click="client=item; sheet=true" >Смотреть</td>
+              <td
+                style="cursor: pointer"
+                @click="
+                  client = item;
+                  sheetConfig = true;
+                  checkClient = true;
+                  getConfigAct();
+                "
+              >
+                Изменить
+              </td>
+              <td
+                style="cursor: pointer"
+                @click="
+                  client = item;
+                  sheet = true;
+                "
+              >
+                Смотреть
+              </td>
             </tr>
           </tbody>
         </template>
@@ -142,8 +160,9 @@
             <div class="both"></div>
             <div class="config">
               <vue-json-editor
-                :show-btns="true"
+                :show-btns="saveBtn"
                 @json-save="onJsonSave"
+                @json-change="onJsonChange"
                 v-if="client.name.split('_')[0] === 'puppeteer'"
                 v-model="getConfig"
                 lang="en"
@@ -218,6 +237,18 @@
         </v-card>
       </v-dialog>
     </v-row>
+
+    <div v-if="snackbar" class="text-center ma-2">
+      <v-snackbar v-model="snackbar"
+      timeout="2000">
+        Конфигурация {{ client.name.split('_')[0] + '_' + client.name.split('_')[1] }} обновлена
+        <template v-slot:action="{ attrs }">
+          <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">
+            Закрыть
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
   </v-app>
 </template>
 
@@ -246,32 +277,30 @@ export default {
       logs: [],
       sheetConfig: false,
       checkClient: false,
-      json: {
-        hello: "vue",
-      },
-      temp: "",
+      snackbar: '',
+      saveBtn: false
     };
   },
   computed: {
     ...mapGetters(["getClients", "getEngines", "getConfig"]),
     getConfig: {
       get() {
-        return this.$store.state.config
+        return this.$store.state.config;
       },
       set(value) {
-        this.config = value
-      }
-    }
+        this.config = value;
+      },
+    },
   },
   sockets: {
-    connect: function() {
+    connect: function () {
       this.whoami();
       this.getStatus();
     },
-    update_clients: function(data) {
+    update_clients: function (data) {
       this.getClientsAct(data);
     },
-    log: function({ member, text, status }) {
+    log: function ({ member, text, status }) {
       this.getClients.map((client) => {
         if (client.name === member) {
           if (client.status !== 2 || status === 0)
@@ -280,7 +309,7 @@ export default {
         }
       });
     },
-    getStatusToClient: function({ member, status }) {
+    getStatusToClient: function ({ member, status }) {
       this.getClients.map((client) => {
         if (client.name === member) {
           if (client.status !== 2 || status === 0)
@@ -314,9 +343,12 @@ export default {
     },
     onJsonSave(value) {
       if (Object.keys(value).length > 0) {
-        this.sendConfigAct(value)
-      }
-      else this.sheetConfig = false
+        this.sendConfigAct(value);
+        this.snackbar = true
+      } else this.sheetConfig = false;
+    },
+    onJsonChange(value) {
+      if (value) this.saveBtn = true
     },
     /**               Socket Methods                  */
     whoami() {
@@ -340,9 +372,9 @@ export default {
       this.logs = this.getClients;
       console.log(this.logs);
       this.showLogsWindow = true;
-    }
+    },
     /************************************************ */
-  }
+  },
 };
 </script>
 
