@@ -6,7 +6,8 @@
     "author": "",
     "scripts": {
         "serve": "vue-cli-service serve --mode development",
-        "build": "vue-cli-service build",
+        "build:dev": "vue-cli-service build --mode development",
+        "build:production": "vue-cli-service build --mode production",
         "lint": "vue-cli-service lint",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
