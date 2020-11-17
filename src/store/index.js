@@ -15,8 +15,9 @@ export default new Vuex.Store({
             let newClients = []
             data.forEach(client => {
                 newClients.push({
-                    name: client,
-                    time: new Date(Date.now()).toLocaleTimeString(),
+                    name: client.name,
+                    time: client.time,
+                    upTime:"0д. 0ч. 0м. 0с.",
                     status: 0,
                     message: 'Подключился!',
                     logs: []
@@ -32,6 +33,40 @@ export default new Vuex.Store({
         },
         setConfig(state, data) {
             state.config = data
+        },
+        updateTime(state){
+            setInterval(()=>{
+                function upTime1(startDate){
+
+                    let fullDate= startDate.split(" ");
+                    let hmss=fullDate[0].split(".")
+                    fullDate[0]=hmss[1]+"/"+hmss[0]+"/"+hmss[2];
+                    var temp=fullDate.join(" ");
+                    if(fullDate[1].split(":")[0]>12){
+                        temp +=" PM"
+                    }
+                    else
+                    {
+                        temp +=" AM"
+                    }
+                        let timePeriod={
+                            days:Math.floor((new Date() - new Date(temp))/(1000*86400)),
+                            hours:Math.floor((new Date() - new Date(temp))/ (1000*60*60))%24,
+                            minutes:Math.floor((new Date() - new Date(temp))/(1000*60))%60,
+                            seconds:Math.floor((new Date() - new Date(temp))/ (1000)%60)
+                        }
+                            function returnDateString(period){
+                                let time = `${period.days}д. ${period.hours}ч. ${period.minutes}м. ${period.seconds}с.`
+                                console.log(time)
+                                return time
+
+                            }
+                        return returnDateString(timePeriod)
+                    }
+                state.clients.forEach(client=>{
+                    client.upTime=upTime1(client.time)
+                })
+            },2000)
         }
     },
     actions: {

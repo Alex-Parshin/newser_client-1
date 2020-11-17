@@ -15,6 +15,7 @@
             <tr>
               <th class="text-left">Клиент</th>
               <th class="text-left">Время подключения</th>
+              <th class="text-left">Время работы</th>
               <th class="text-left">Действия</th>
               <th class="text-left">Конфиг</th>
               <th class="text-left">Логи</th>
@@ -31,7 +32,19 @@
                   color="red"
                 ></v-progress-circular>
               </td>
-              <td>{{ item.time }}</td>
+              <td class="timeConnect">
+                {{ item.time }}
+                 <div style="min-height: 4px;">
+                    <v-progress-linear
+                      v-if="item.status===1"
+                      color="green"
+                      class="isWorkStatus"
+                      :active="show"
+                      :indeterminate="query"
+                    ></v-progress-linear>
+                  </div>
+              </td>
+              <td>{{item.upTime}}</td>
               <td>
                 <div style="margin-top: 5px">
                   <v-btn
@@ -84,26 +97,7 @@
                   </v-btn>
                 </div>
               </td>
-              <!-- <td
-                style="cursor:pointer"
-                @click="
-                  client = item;
-                  sheetConfig = true;
-                  checkClient = true;
-                  tempJsonData();
-                "
-              >
-                Изменить
-              </td>
-              <td
-                style="cursor:pointer;"
-                @click="
-                  client = item;
-                  sheet = true;
-                "
-              >
-                Смотреть
-              </td> -->
+            
               <td
                 style="cursor: pointer"
                 @click="
@@ -253,7 +247,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 import vueJsonEditor from "vue-json-editor";
 export default {
   name: "App",
@@ -262,6 +256,8 @@ export default {
   },
   mounted() {
     this.getEnginesAct();
+    this.queryAndIndeterminate();
+    this.updateTime();
   },
   data() {
     return {
@@ -278,7 +274,10 @@ export default {
       sheetConfig: false,
       checkClient: false,
       snackbar: '',
-      saveBtn: false
+      saveBtn: false,
+      query: false,
+      show: true,
+      interval: 0,
     };
   },
   computed: {
@@ -321,6 +320,7 @@ export default {
   },
   methods: {
     ...mapActions(["clientsAct", "enginesAct", "configAct", "sendConfigAct"]),
+    ...mapMutations(["updateTime"]),
     setClient(client) {
       this.client = client;
       this.client_name = client.name;
@@ -373,6 +373,15 @@ export default {
       console.log(this.logs);
       this.showLogsWindow = true;
     },
+      queryAndIndeterminate () {
+        this.query = true
+        this.show = true
+
+        this.interval = setInterval(() => {
+
+          }, 1000)
+      },
+
     /************************************************ */
   },
 };
@@ -459,5 +468,14 @@ export default {
   top: 0;
   bottom: 0;
   margin: auto;
+}
+.isWorkStatus{
+  width: 150px;
+
+}
+.timeConnect{
+display: flex;
+justify-content: center;
+flex-direction: column;
 }
 </style>
