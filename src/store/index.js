@@ -39,8 +39,8 @@ export default new Vuex.Store({
                 function upTime1(startDate){
 
                     let fullDate= startDate.split(" ");
-                    let hmss=fullDate[0].split(".")
-                    fullDate[0]=hmss[1]+"/"+hmss[0]+"/"+hmss[2];
+                    // let hmss=fullDate[0].split(".")
+                    // fullDate[0]=hmss[1]+"/"+hmss[0]+"/"+hmss[2];
                     var temp=fullDate.join(" ");
                     if(fullDate[1].split(":")[0]>12){
                         temp +=" PM"
